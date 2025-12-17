@@ -76,6 +76,43 @@
 - **Observability:** Structured logs per provider, metrics on latency/failure rates, and dead-letter queues for ingestion errors.
 - **Data consistency:** Strong consistency for user-facing reads after ingestion completion; eventual consistency acceptable during in-flight sync.
 
+## Caching Strategy
+- **API responses:** Cache read-heavy endpoints (activity lists, summary stats) in Redis with short TTLs (30–120s) and per-user keys; bust cache on ingest/update events.
+- **Charts & aggregates:** Precompute daily/weekly aggregates and cache chart datasets separately from raw activity detail. Include version stamps on cached chart payloads to avoid stale schema reads.
+- **Provider calls:** Cache Garmin metadata (device catalog, activity type lookups) for hours to reduce upstream calls while keeping user-specific data uncached for freshness.
+- **Client hints:** Encourage HTTP caching (ETag/Last-Modified) on static assets and public docs; disable caching on authenticated responses that include PII unless explicitly covered above.
+
+## Rate Limits & Throttling
+- **Public/API gateway:** Per-IP rate limit for auth endpoints (e.g., 20 req/min) and global burst limits to deter brute force. Return `429` with retry-after headers.
+- **Per-user:** Limit manual sync triggers (e.g., 3 per hour) and file uploads (size and count) per user/tenant. Protect export downloads with signed URLs and short expirations.
+- **Provider safety:** Enforce back-pressure for Garmin API polling/webhooks to stay under vendor quotas; queue retries with exponential backoff and jitter.
+
+## Audit Logging
+- **Coverage:** Record authentication events, role/permission changes, provider linking/unlinking, manual sync actions, exports/downloads, and data deletion requests.
+- **Content:** Include actor, target user/resource, action, justification (where applicable), timestamp, source IP/device, and success/failure with error codes.
+- **Access:** Store immutable append-only logs with tamper-evident hashing; expose filtered views to admins with search/export while enforcing RBAC.
+
+## Encryption & Secrets
+- **In transit:** Enforce TLS for all endpoints; mutual TLS for admin/control plane when possible.
+- **At rest:** Encrypt databases, object storage, and backups. Provider tokens and refresh tokens stored encrypted using KMS/host-managed keys; rotate keys regularly.
+- **Secrets management:** Use environment variables sourced from a secrets manager (or host-level vault) with audit trails; never persist secrets in logs or exports.
+
+## Compliance & Governance
+- **Privacy:** Treat user identities and GPS/location data as sensitive; default to least-privilege access and minimize retention of raw payloads (30–90 days unless required longer).
+- **Data subject rights:** Provide self-service export/deletion with SLA tracking and confirmation, and propagate deletions to providers when applicable.
+- **Policies:** Maintain access reviews for admin/service accounts, change management with approvals for schema/storage changes, and incident response playbooks covering data leaks.
+- **Standards alignment:** Design controls to map to GDPR (consent, data minimization, residency considerations) and SOC 2 trust principles (security, availability, confidentiality) even if certification is future-phase.
+
+## Performance Targets
+- **API latency:** P95 authenticated read endpoints ≤300 ms; write/ingestion-trigger endpoints ≤500 ms excluding background job processing. Webhook ingestion acknowledged within 200 ms before async processing.
+- **Dashboards/charts:** Initial dashboard load time budget 2–3 seconds on broadband; chart render/update P95 ≤800 ms after data fetch, with datasets paginated or windowed for long activities.
+- **Background jobs:** Polling and webhook-to-durable-store pipeline end-to-end within 30 seconds under normal load; exports generated within 2 minutes for typical weekly ranges.
+
+## Testing Approach
+- **Unit tests:** Cover parsers, deduplication, normalization, and role checks with deterministic fixtures; target high coverage on ingestion and sharing logic.
+- **Integration/E2E:** Exercise OAuth linking, webhook receipt, manual sync, file upload, and admin audit views via headless runs; include regression tests for chart rendering and RBAC.
+- **Load & resilience:** Run periodic load tests for ingestion throughput and dashboard queries to validate rate limits/latency targets; include chaos tests for queue/db/redis outages and back-pressure behavior.
+
 ## Assumptions & Dependencies
 - Garmin Health API credentials (sandbox and production) will be provisioned and owned by the platform team, with redirect URIs and webhook URLs registered up front.
 - Webhook hosting will be reachable by Garmin without private-network constraints; any IP allowlists are managed by the platform.
