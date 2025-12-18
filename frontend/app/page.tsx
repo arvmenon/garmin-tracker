@@ -20,6 +20,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { EmptyState } from "@/components/feedback/EmptyState";
+import { SyncStatusCard } from "@/components/sync/SyncStatusCard";
 
 const stats = [
   { label: "Sync latency", value: "<150ms", detail: "cached fetch + SWR" },
@@ -95,6 +96,7 @@ export default function Home() {
                       </Stat>
                     ))}
                   </Stack>
+                  <SyncStatusCard />
                 </Stack>
               </Box>
             </Flex>

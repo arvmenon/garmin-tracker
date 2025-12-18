@@ -11,7 +11,12 @@ FastAPI backend with a Next.js + Chakra UI frontend for Garmin activity insights
 6. Start the UI on port **4010**: `npm run dev` (production: `npm run start`, also on **4010**).
 7. Run tests: `pytest` for backend; `npm run lint` for frontend.
 
-Dockerized stack is available via `docker-compose up --build` (API on `http://localhost:8000`, UI on `http://localhost:4010`).
+### Docker
+- Bring up the UI and API with `docker-compose up frontend api` (add `--build` on the first run).
+- Services expose:
+  - API: `http://localhost:8009`
+  - Frontend: `http://localhost:4010`
+- The compose file sets `NEXT_PUBLIC_API_BASE_URL` for the UI and `ALLOWED_ORIGINS` for the API to keep CORS aligned.
 
 ## Branching
 All pull requests should target the `development` branch (not `main`).

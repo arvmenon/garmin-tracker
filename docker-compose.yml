@@ -9,8 +9,22 @@ services:
       - "8009:8000"
     environment:
       - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/garmin_tracker
+      - ALLOWED_ORIGINS=http://localhost:4010
     depends_on:
       - db
+
+  frontend:
+    image: node:18
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- -p 4010"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8009
+    ports:
+      - "4010:4010"
+    depends_on:
+      - api
 
   db:
     image: postgres:15-alpine
