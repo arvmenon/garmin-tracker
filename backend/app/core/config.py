@@ -4,9 +4,31 @@ from typing import List
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+DEFAULT_ALLOWED_ORIGINS = ("http://localhost:4010",)
+
+
+def _normalize_origins(value: Any) -> list[str]:
+    if value is None:
+        return list(DEFAULT_ALLOWED_ORIGINS)
+
+    if isinstance(value, str):
+        candidates = [segment.strip() for segment in value.split(",") if segment.strip()]
+        return candidates or list(DEFAULT_ALLOWED_ORIGINS)
+
+    if isinstance(value, (list, tuple, set)):
+        candidates = [str(segment).strip() for segment in value if str(segment).strip()]
+        return candidates or list(DEFAULT_ALLOWED_ORIGINS)
+
+    return list(DEFAULT_ALLOWED_ORIGINS)
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
     app_name: str = Field("Garmin Tracker API", description="Human-friendly service name")
     environment: str = Field("development", description="Runtime environment name")
