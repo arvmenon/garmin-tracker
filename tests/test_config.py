@@ -23,3 +23,13 @@ def test_allowed_origins_falls_back_when_empty(monkeypatch):
     settings = Settings()
 
     assert settings.allowed_origins == ["http://localhost:4010"]
+
+
+def test_allowed_origins_accepts_iterable(monkeypatch):
+    monkeypatch.setenv("ALLOWED_ORIGINS", "http://example.com")
+
+    settings = Settings(
+        allowed_origins_override=["http://example.com", " ", "http://localhost:3000"]
+    )
+
+    assert settings.allowed_origins == ["http://example.com", "http://localhost:3000"]
