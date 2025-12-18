@@ -1,8 +1,14 @@
+import json
 from functools import lru_cache
-from typing import List, Any
+from typing import Any, List
 
-from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, FieldValidationInfo, field_validator
+from pydantic_settings import (
+    BaseSettings,
+    EnvSettingsSource,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 DEFAULT_ALLOWED_ORIGINS = ("http://localhost:4010",)
 
@@ -28,6 +34,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        env_ignore_empty=True,
     )
 
     app_name: str = Field("Garmin Tracker API", description="Human-friendly service name")
@@ -36,6 +43,10 @@ class Settings(BaseSettings):
         "postgresql+psycopg2://postgres:postgres@db:5432/garmin_tracker",
         description="PostgreSQL connection string",
     )
+    allowed_origins_override: list[str] | None = Field(
+        default=None,
+        description="Optional override for allowed CORS origins",
+    )
     allowed_origins: List[str] = Field(
         default_factory=lambda: ["http://localhost:4010"],
         description="Comma-separated list of allowed CORS origins",
@@ -43,10 +54,41 @@ class Settings(BaseSettings):
 
     @field_validator("allowed_origins", mode="before")
     @classmethod
-    def split_origins(cls, value: str | list[str]) -> list[str]:
-        if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
-        return value
+    def split_origins(cls, value: Any, info: FieldValidationInfo) -> list[str]:
+        if info.data.get("allowed_origins_override") is not None:
+            return _normalize_origins(info.data["allowed_origins_override"])
+
+        return _normalize_origins(value)
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        class LenientEnvSettingsSource(EnvSettingsSource):
+            def decode_complex_value(self, field_name: str, field: Field, value: Any) -> Any:  # type: ignore[override]
+                if isinstance(value, str):
+                    cleaned = value.strip()
+                    if not cleaned:
+                        return cleaned
+
+                    try:
+                        return json.loads(cleaned)
+                    except json.JSONDecodeError:
+                        return cleaned
+
+                return value
+
+        return (
+            init_settings,
+            LenientEnvSettingsSource(cls),
+            dotenv_settings,
+            file_secret_settings,
+        )
 
 
 @lru_cache
