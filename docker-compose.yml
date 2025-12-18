@@ -9,8 +9,22 @@ services:
       - "8009:8000"
     environment:
       - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/garmin_tracker
+      - ALLOWED_ORIGINS=http://localhost:4010,http://frontend:4010
     depends_on:
       - db
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://api:8000
+    ports:
+      - "4010:4010"
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
 
   db:
     image: postgres:15-alpine
@@ -18,8 +32,10 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: garmin_tracker
+      NETDATA_DB_PASSWORD: netdata
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
 
