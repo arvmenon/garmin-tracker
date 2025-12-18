@@ -1,15 +1,18 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 NETDATA_PASSWORD=${NETDATA_DB_PASSWORD:-netdata}
 
 # Ensure a monitoring-friendly role exists to satisfy connections using the "netdata" user.
 # Password is configurable via NETDATA_DB_PASSWORD and defaults to "netdata".
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<SQL
+psql -v ON_ERROR_STOP=1 \
+     --username "$POSTGRES_USER" \
+     --dbname "$POSTGRES_DB" \
+     -v netdata_password="${NETDATA_PASSWORD}" <<'SQL'
 DO
 $$
 DECLARE
-    target_password text := ${NETDATA_PASSWORD@Q};
+    target_password text := :'netdata_password';
 BEGIN
     IF NOT EXISTS (
         SELECT FROM pg_catalog.pg_roles WHERE rolname = 'netdata'
