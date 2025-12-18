@@ -14,17 +14,17 @@ services:
       - db
 
   frontend:
-    build:
-      context: frontend
-      dockerfile: Dockerfile
+    image: node:18
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- -p 4010"
+    volumes:
+      - ./frontend:/app
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://api:8000
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8009
     ports:
       - "4010:4010"
     depends_on:
       - api
-    volumes:
-      - ./frontend:/app
 
   db:
     image: postgres:15-alpine

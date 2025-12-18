@@ -1,7 +1,7 @@
 from functools import lru_cache
-from typing import Any
+from typing import List
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEFAULT_ALLOWED_ORIGINS = ("http://localhost:4010",)
@@ -36,21 +36,17 @@ class Settings(BaseSettings):
         "postgresql+psycopg2://postgres:postgres@db:5432/garmin_tracker",
         description="PostgreSQL connection string",
     )
-    allowed_origins_raw: str | None = Field(
-        default=None,
-        validation_alias="ALLOWED_ORIGINS",
+    allowed_origins: List[str] = Field(
+        default_factory=lambda: ["http://localhost:4010"],
         description="Comma-separated list of allowed CORS origins",
     )
-    allowed_origins_override: list[str] | None = Field(
-        default=None, description="Explicit override for allowed origins"
-    )
 
-    @property
-    def allowed_origins(self) -> list[str]:
-        if self.allowed_origins_override is not None:
-            return _normalize_origins(self.allowed_origins_override)
-
-        return _normalize_origins(self.allowed_origins_raw)
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def split_origins(cls, value: str | list[str]) -> list[str]:
+        if isinstance(value, str):
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
 
 
 @lru_cache
