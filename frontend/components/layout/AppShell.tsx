@@ -8,10 +8,10 @@ import { DesktopSidebar, type NavItem } from "@/components/navigation/DesktopSid
 import { MobileBottomNav } from "@/components/navigation/MobileBottomNav";
 
 const navItems: NavItem[] = [
-  { label: "Overview", href: "#overview", description: "Wireframe-ready dashboard shell" },
-  { label: "Activities", href: "#activities", description: "Recent workouts and cadence" },
-  { label: "Comparisons", href: "#comparisons", description: "Trends and goals" },
-  { label: "Settings", href: "#settings", description: "Connections and alerts" },
+  { label: "Overview", href: "/", description: "Wireframe-ready dashboard shell" },
+  { label: "Activities", href: "/activities", description: "Filters, pagination, and detail" },
+  { label: "Comparisons", href: "/#comparisons", description: "Trends and goals" },
+  { label: "Settings", href: "/#settings", description: "Connections and alerts" },
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
