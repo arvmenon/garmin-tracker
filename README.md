@@ -7,8 +7,9 @@ FastAPI backend with a Next.js + Chakra UI frontend for Garmin activity insights
 2. Install backend deps: `pip install -r backend/requirements.txt`.
 3. Run the API locally: `uvicorn backend.app.main:app --reload`.
 4. Install frontend deps: `cd frontend && npm install` (Node 18+).
-5. Start the UI on port **4010**: `npm run dev`.
-6. Run tests: `pytest` for backend; `npm run lint` for frontend.
+5. Copy `frontend/.env.example` to `frontend/.env.local` and set `NEXT_PUBLIC_API_BASE_URL` to your API origin.
+6. Start the UI on port **4010**: `npm run dev` (production: `npm run start`, also on **4010**).
+7. Run tests: `pytest` for backend; `npm run lint` for frontend.
 
 ### Docker
 - Bring up the UI and API with `docker-compose up frontend api` (add `--build` on the first run).
