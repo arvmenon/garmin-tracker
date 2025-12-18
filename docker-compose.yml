@@ -48,6 +48,7 @@ services:
       POSTGRES_DB: garmin_tracker
       NETDATA_DB_PASSWORD: netdata
       PGHOST: db
+      PGPASSWORD: postgres
     volumes:
       - ./docker/db-init/01-create-netdata-user.sh:/scripts/create-netdata-user.sh:ro
     entrypoint: >-
