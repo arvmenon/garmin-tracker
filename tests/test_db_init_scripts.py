@@ -7,7 +7,12 @@ SCRIPT_PATH = Path(__file__).resolve().parents[1] / "docker/db-init/00-bootstrap
 
 
 def run_bootstrap_script(
-    tmp_path, app_password=None, readonly_password=None, app_db_name=None
+    tmp_path,
+    app_password=None,
+    readonly_password=None,
+    app_db_name=None,
+    netdata_password=None,
+    netdata_user=None,
 ):
     capture_path = tmp_path / "captured.sql"
     stub_psql = tmp_path / "psql"
@@ -43,6 +48,16 @@ cat >>"$PSQL_CAPTURE_PATH"
     elif "APP_DB_NAME" in env:
         env.pop("APP_DB_NAME")
 
+    if netdata_password is not None:
+        env["NETDATA_DB_PASSWORD"] = netdata_password
+    elif "NETDATA_DB_PASSWORD" in env:
+        env.pop("NETDATA_DB_PASSWORD")
+
+    if netdata_user is not None:
+        env["NETDATA_DB_USER"] = netdata_user
+    elif "NETDATA_DB_USER" in env:
+        env.pop("NETDATA_DB_USER")
+
     subprocess.run(["sh", str(SCRIPT_PATH)], check=True, env=env)
 
     return capture_path.read_text()
@@ -60,6 +75,7 @@ def test_bootstrap_script_defaults_to_expected_passwords(tmp_path):
 
     assert "app_password text := 'garmin_app';" in sql
     assert "readonly_password text := 'garmin_readonly';" in sql
+    assert "netdata_password text := 'netdata';" in sql
 
 
 def test_bootstrap_script_sets_up_roles_and_privileges(tmp_path):
@@ -68,6 +84,7 @@ def test_bootstrap_script_sets_up_roles_and_privileges(tmp_path):
         app_password="garmin_app",
         readonly_password="garmin_readonly",
         app_db_name="garmin_tracker",
+        netdata_password="netdata",
     )
 
     assert "app_db text := 'garmin_tracker';" in sql
@@ -78,3 +95,10 @@ def test_bootstrap_script_sets_up_roles_and_privileges(tmp_path):
     assert "GRANT USAGE, CREATE ON SCHEMA public" in sql
     assert "GRANT SELECT ON ALL TABLES IN SCHEMA public" in sql
     assert "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO %I" in sql
+    assert "GRANT pg_monitor TO %I" in sql
+
+
+def test_bootstrap_script_allows_disabling_netdata_role(tmp_path):
+    sql = run_bootstrap_script(tmp_path, netdata_user="")
+
+    assert "netdata_user text := '';" in sql
