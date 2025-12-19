@@ -8,4 +8,5 @@ RUN npm ci
 COPY . .
 
 EXPOSE 4010
-CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
+RUN npm run build
+CMD ["npm", "run", "start"]
