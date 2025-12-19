@@ -10,7 +10,6 @@ Welcome! This repository currently holds early product requirements for a Garmin
 - Keep product requirements in `REQUIREMENTS.md` up to date when scope or decisions change.
 - Prefer small, well-scoped commits with descriptive messages.
 - Include a short summary and a list of tests run in your final response.
-- Target pull requests to the `development` branch rather than `main`.
 
 ## Code & Documentation Style
 - Favor clear, concise language in documentation; prefer headings and bullet lists over long paragraphs.
