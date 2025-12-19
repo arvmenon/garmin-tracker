@@ -9,7 +9,7 @@ import {
   Heading,
   HStack,
   Progress,
-  Separator,
+  Divider,
   SimpleGrid,
   Stack,
   Stat,
@@ -161,7 +161,7 @@ export default function Home() {
             <Heading size="lg">Comparisons</Heading>
             <Text color="text.muted">Use semantic tokens to keep charts readable in any mode.</Text>
           </Stack>
-          <Separator />
+          <Divider />
           <EmptyState
             title="No comparison data yet"
             description="Connect Garmin and set at least two time ranges to unlock trend comparisons and PR tracking."
