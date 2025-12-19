@@ -22,6 +22,9 @@ export default function ActivitiesPage() {
             Filters, pagination, and loading states follow the dashboard wireframes. Data hydrates from the FastAPI fixtures at
             <code>NEXT_PUBLIC_API_BASE_URL</code>.
           </Text>
+          <Text color="text.muted" maxW="3xl">
+            Comparison views will live alongside activity timelines, with shared filters and date ranges.
+          </Text>
         </Stack>
 
         <Box borderWidth="1px" borderColor="border.subtle" borderRadius="lg" bg="bg.surface" shadow="card">

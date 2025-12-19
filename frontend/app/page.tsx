@@ -1,33 +1,16 @@
 "use client";
 
-import React from "react";
 import {
   Badge,
   Box,
   Button,
   Container,
-  Flex,
   Heading,
   HStack,
-  Progress,
-  Divider,
   SimpleGrid,
   Stack,
-  Stat,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
   Text,
-  VStack,
 } from "@chakra-ui/react";
-import { EmptyState } from "@/components/feedback/EmptyState";
-import { SyncStatusCard } from "@/components/sync/SyncStatusCard";
-
-const stats = [
-  { label: "Sync latency", value: "<150ms", detail: "cached fetch + SWR" },
-  { label: "UI thread work", value: "1.2ms", detail: "lightweight theming" },
-  { label: "Bundle focus", value: "zero CSS-in-JS reset", detail: "Chakra only" },
-];
 
 const accelerators = [
   {
@@ -52,55 +35,25 @@ export default function Home() {
       <Stack spacing={12}>
         <Box as="section" id="overview">
           <Stack spacing={10}>
-            <Flex
-              align={{ base: "flex-start", md: "center" }}
-              direction={{ base: "column", md: "row" }}
-              gap={{ base: 8, md: 10 }}
-            >
-              <Stack spacing={5} flex={1}>
-                <Badge colorScheme="teal" w="fit-content" px={3} py={1} borderRadius="full">
-                  Garmin Tracker UI
-                </Badge>
-                <Heading size={{ base: "lg", md: "xl" }}>
-                  Speed-focused scaffold for dashboards, comparisons, and sync status.
-                </Heading>
-                <Text color="text.muted" fontSize="lg">
-                  Bootstrapped with Chakra UI for fast rendering, accessible defaults, and smooth hand-off to Garmin APIs.
-                </Text>
-                <HStack spacing={4} wrap="wrap">
-                  <Button colorScheme="teal" size="lg">
-                    Open dashboard shell
-                  </Button>
-                  <Button variant="ghost" size="lg">
-                    Configure API target
-                  </Button>
-                </HStack>
-              </Stack>
-              <Box
-                bg="bg.surface"
-                borderRadius="lg"
-                shadow="card"
-                p={6}
-                flexBasis={{ base: "100%", md: "360px" }}
-                borderWidth="1px"
-                borderColor="border.subtle"
-              >
-                <Stack spacing={4}>
-                  <Heading size="md">Runtime health</Heading>
-                  <Progress value={82} colorScheme="teal" borderRadius="full" aria-label="Runtime readiness" />
-                  <Stack spacing={3}>
-                    {stats.map((stat) => (
-                      <Stat key={stat.label}>
-                        <StatLabel color="text.muted">{stat.label}</StatLabel>
-                        <StatNumber>{stat.value}</StatNumber>
-                        <StatHelpText color="text.muted">{stat.detail}</StatHelpText>
-                      </Stat>
-                    ))}
-                  </Stack>
-                  <SyncStatusCard />
-                </Stack>
-              </Box>
-            </Flex>
+            <Stack spacing={5}>
+              <Badge colorScheme="teal" w="fit-content" px={3} py={1} borderRadius="full">
+                Garmin Tracker UI
+              </Badge>
+              <Heading size={{ base: "lg", md: "xl" }}>
+                Speed-focused scaffold for dashboards, activities, and sync status.
+              </Heading>
+              <Text color="text.muted" fontSize="lg">
+                Bootstrapped with Chakra UI for fast rendering, accessible defaults, and smooth hand-off to Garmin APIs.
+              </Text>
+              <HStack spacing={4} wrap="wrap">
+                <Button colorScheme="teal" size="lg">
+                  Open dashboard shell
+                </Button>
+                <Button variant="ghost" size="lg">
+                  Configure API target
+                </Button>
+              </HStack>
+            </Stack>
 
             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
               {accelerators.map((item) => (
@@ -136,12 +89,12 @@ export default function Home() {
             borderColor="border.subtle"
           >
             <Stack direction={{ base: "column", md: "row" }} spacing={6} justify="space-between" align="center">
-              <VStack align="flex-start" spacing={3}>
+              <Stack align="flex-start" spacing={3}>
                 <Heading size="md">Next steps</Heading>
                 <Text color="text.muted">
                   Wire the API client, add dashboard routes, and keep the UI lean. The stack is ready for rapid iteration.
                 </Text>
-              </VStack>
+              </Stack>
               <HStack spacing={3}>
                 <Badge colorScheme="purple" variant="subtle" px={3} py={1} borderRadius="full">
                   Optimized
@@ -155,19 +108,6 @@ export default function Home() {
               </HStack>
             </Stack>
           </Box>
-        </Stack>
-
-        <Stack spacing={8} as="section" id="comparisons">
-          <Stack spacing={3}>
-            <Heading size="lg">Comparisons</Heading>
-            <Text color="text.muted">Use semantic tokens to keep charts readable in any mode.</Text>
-          </Stack>
-          <Divider />
-          <EmptyState
-            title="No comparison data yet"
-            description="Connect Garmin and set at least two time ranges to unlock trend comparisons and PR tracking."
-            actionLabel="Connect Garmin"
-          />
         </Stack>
 
       </Stack>
