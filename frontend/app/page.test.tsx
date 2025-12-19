@@ -1,5 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 

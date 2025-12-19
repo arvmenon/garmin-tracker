@@ -10,7 +10,7 @@ from pydantic_settings import (
     SettingsConfigDict,
 )
 
-DEFAULT_ALLOWED_ORIGINS = ("http://localhost:4010",)
+DEFAULT_ALLOWED_ORIGINS = ("http://localhost:4010", "http://127.0.0.1:4010")
 
 
 def _normalize_origins(value: Any) -> list[str]:
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
         description="Optional override for allowed CORS origins",
     )
     allowed_origins: List[str] = Field(
-        default_factory=lambda: ["http://localhost:4010"],
+        default_factory=lambda: list(DEFAULT_ALLOWED_ORIGINS),
         description="Comma-separated list of allowed CORS origins",
     )
 

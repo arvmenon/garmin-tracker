@@ -7,7 +7,7 @@ services:
       - "8009:8000"
     environment:
       - DATABASE_URL=postgresql+psycopg2://${APP_DB_USER:-garmin_app}:${APP_DB_PASSWORD:-garmin_app}@db:5432/${APP_DB_NAME:-garmin_tracker}
-      - ALLOWED_ORIGINS=http://localhost:4010,http://frontend:4010
+      - ALLOWED_ORIGINS=http://localhost:4010,http://127.0.0.1:4010,http://frontend:4010
     depends_on:
       - db
 

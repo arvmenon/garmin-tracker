@@ -6,7 +6,10 @@ def test_allowed_origins_default(monkeypatch):
 
     settings = Settings()
 
-    assert settings.allowed_origins == ["http://localhost:4010"]
+    assert settings.allowed_origins == [
+        "http://localhost:4010",
+        "http://127.0.0.1:4010",
+    ]
 
 
 def test_allowed_origins_parses_comma_separated(monkeypatch):
@@ -22,7 +25,10 @@ def test_allowed_origins_falls_back_when_empty(monkeypatch):
 
     settings = Settings()
 
-    assert settings.allowed_origins == ["http://localhost:4010"]
+    assert settings.allowed_origins == [
+        "http://localhost:4010",
+        "http://127.0.0.1:4010",
+    ]
 
 
 def test_allowed_origins_accepts_iterable(monkeypatch):
