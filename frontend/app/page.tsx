@@ -170,40 +170,6 @@ export default function Home() {
           />
         </Stack>
 
-        <Stack spacing={8} as="section" id="settings">
-          <Stack spacing={3}>
-            <Heading size="lg">Settings</Heading>
-            <Text color="text.muted">
-              Configure sync cadence, focus indicators, and reduced motion preferences from one place.
-            </Text>
-          </Stack>
-          <Box
-            p={{ base: 6, md: 8 }}
-            borderRadius="lg"
-            bg="bg.surface"
-            borderWidth="1px"
-            borderColor="border.subtle"
-            shadow="card"
-          >
-            <Stack spacing={4}>
-              <Heading size="md">Interface controls</Heading>
-              <Text color="text.muted">
-                Color mode toggles, motion reduction tokens, and focus ring styling live at the layout level for consistency.
-              </Text>
-              <HStack spacing={3} wrap="wrap">
-                <Badge colorScheme="teal" variant="outline" px={3} py={1} borderRadius="full">
-                  Motion aware
-                </Badge>
-                <Badge colorScheme="gray" variant="outline" px={3} py={1} borderRadius="full">
-                  Tokenized
-                </Badge>
-                <Badge colorScheme="green" variant="outline" px={3} py={1} borderRadius="full">
-                  Accessible focus
-                </Badge>
-              </HStack>
-            </Stack>
-          </Box>
-        </Stack>
       </Stack>
     </Container>
   );

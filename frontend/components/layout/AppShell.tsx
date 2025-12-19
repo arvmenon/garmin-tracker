@@ -2,16 +2,18 @@
 
 import { ReactNode } from "react";
 import { Box, Flex, Heading, HStack, Stack, Text, useColorModeValue } from "@chakra-ui/react";
+import { FiSettings } from "react-icons/fi";
 
 import ColorModeToggle from "@/components/navigation/ColorModeToggle";
-import { DesktopSidebar, type NavItem } from "@/components/navigation/DesktopSidebar";
-import { MobileBottomNav } from "@/components/navigation/MobileBottomNav";
+import { type NavItem, TopNav } from "@/components/navigation/TopNav";
 
 const navItems: NavItem[] = [
-  { label: "Overview", href: "/", description: "Wireframe-ready dashboard shell" },
-  { label: "Activities", href: "/activities", description: "Filters, pagination, and detail" },
-  { label: "Comparisons", href: "/#comparisons", description: "Trends and goals" },
-  { label: "Settings", href: "/#settings", description: "Connections and alerts" },
+  { label: "Overview", href: "/" },
+  { label: "Activities", href: "/activities" },
+  { label: "Comparisons", href: "/compare" },
+  { label: "Devices", href: "/devices" },
+  { label: "Admin", href: "/admin" },
+  { label: "Settings", href: "/settings", icon: FiSettings },
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -19,20 +21,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const muted = useColorModeValue("gray.600", "gray.300");
 
   return (
-    <Flex minH="100vh" bg="bg.canvas" color="text.primary">
-      <DesktopSidebar navItems={navItems} />
-      <Flex direction="column" flex={1} minW={0}>
-        <Box
-          as="header"
-          borderBottomWidth="1px"
-          borderColor={headerBorder}
-          bg="bg.surface"
-          px={{ base: 4, md: 8 }}
-          py={{ base: 4, md: 5 }}
-          position="sticky"
-          top={0}
-          zIndex={5}
-        >
+    <Flex minH="100vh" bg="bg.canvas" color="text.primary" direction="column">
+      <Box
+        as="header"
+        borderBottomWidth="1px"
+        borderColor={headerBorder}
+        bg="bg.surface"
+        px={{ base: 4, md: 8 }}
+        py={{ base: 4, md: 5 }}
+        position="sticky"
+        top={0}
+        zIndex={5}
+      >
+        <Stack spacing={{ base: 4, md: 5 }}>
           <HStack justify="space-between" spacing={{ base: 4, md: 8 }}>
             <Stack spacing={1}>
               <Heading size="md">Garmin activity tracker</Heading>
@@ -42,15 +43,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </Stack>
             <ColorModeToggle />
           </HStack>
+          <TopNav navItems={navItems} />
+        </Stack>
+      </Box>
+
+      <Flex as="main" flex={1} px={{ base: 4, md: 8 }} py={{ base: 6, md: 10 }} minH={0}>
+        <Box width="full" id="overview">
+          {children}
         </Box>
-
-        <Flex as="main" flex={1} px={{ base: 4, md: 8 }} py={{ base: 6, md: 10 }} minH={0}>
-          <Box width="full" pb={{ base: 16, lg: 0 }} id="overview">
-            {children}
-          </Box>
-        </Flex>
-
-        <MobileBottomNav navItems={navItems} />
       </Flex>
     </Flex>
   );
