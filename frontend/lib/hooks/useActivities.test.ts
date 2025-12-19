@@ -18,9 +18,19 @@ const getActivitiesMock = vi.mocked(getActivities);
 describe("useActivities", () => {
   it("configures the activities query and delegates to the API helper", async () => {
     const params = { page: 2, pageSize: 5, type: "running" };
-    useQueryMock.mockReturnValue({} as ReturnType<typeof useActivities>);
+    const queryResult = {
+      data: {
+        items: [],
+        count: 0,
+        page: 2,
+        pageSize: 5,
+        hasMore: false,
+      },
+    };
+    useQueryMock.mockReturnValue(queryResult as ReturnType<typeof useActivities>);
 
-    useActivities(params);
+    const result = useActivities(params);
+    expect(result).toBe(queryResult);
 
     expect(useQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({
