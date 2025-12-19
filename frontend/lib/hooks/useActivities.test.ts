@@ -47,4 +47,19 @@ describe("useActivities", () => {
     await expect(queryOptions.queryFn()).resolves.toBe(apiResponse);
     expect(getActivitiesMock).toHaveBeenCalledWith(params);
   });
+
+  it("uses the provided params when constructing the query key", () => {
+    const params = { page: 1, pageSize: 10, provider: "garmin" };
+    const queryResult = { data: undefined };
+    useQueryMock.mockReturnValue(queryResult as ReturnType<typeof useActivities>);
+
+    const result = useActivities(params);
+
+    expect(result).toBe(queryResult);
+    expect(useQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: [ACTIVITIES_QUERY_KEY, params],
+      }),
+    );
+  });
 });
