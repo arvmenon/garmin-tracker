@@ -76,6 +76,14 @@
 - **Observability:** Structured logs per provider, metrics on latency/failure rates, and dead-letter queues for ingestion errors.
 - **Data consistency:** Strong consistency for user-facing reads after ingestion completion; eventual consistency acceptable during in-flight sync.
 
+## Database Provisioning & Operations
+- **Bootstrap workflow:** Database setup must be repeatable from zero and safe to re-run; use a single documented flow for local, staging, and production.
+- **Roles & access:** Separate roles for migrations, application write access, and read-only analytics/export usage.
+- **Migrations:** Every schema change ships as a migration with explicit rollback guidance; migrations are executed by a single job per deploy.
+- **Seed data:** Reference data (activity types, device catalogs, RBAC defaults) must be versioned and tracked in a `seed_history` table.
+- **Reset policy:** Local development can drop and rebuild data; staging/production reset is forbidden outside approved disaster recovery procedures.
+- **Backup readiness:** Backups and restore drills are required; WAL archiving enabled wherever durability matters.
+
 ## Caching Strategy
 - **API responses:** Cache read-heavy endpoints (activity lists, summary stats) in Redis with short TTLs (30–120s) and per-user keys; bust cache on ingest/update events.
 - **Charts & aggregates:** Precompute daily/weekly aggregates and cache chart datasets separately from raw activity detail. Include version stamps on cached chart payloads to avoid stale schema reads.
