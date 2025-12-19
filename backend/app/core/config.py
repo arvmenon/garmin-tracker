@@ -39,6 +39,9 @@ class Settings(BaseSettings):
 
     app_name: str = Field("Garmin Tracker API", description="Human-friendly service name")
     environment: str = Field("development", description="Runtime environment name")
+    debug_logging: bool = Field(
+        False, description="Enable verbose application logging for troubleshooting"
+    )
     database_url: str = Field(
         "postgresql+psycopg2://garmin_app:garmin_app@localhost:5432/garmin_tracker",
         description="PostgreSQL connection string",

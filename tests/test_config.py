@@ -47,3 +47,11 @@ def test_database_url_default(monkeypatch):
     settings = Settings()
 
     assert settings.database_url == "postgresql+psycopg2://garmin_app:garmin_app@localhost:5432/garmin_tracker"
+
+
+def test_debug_logging_parses_bool(monkeypatch):
+    monkeypatch.setenv("DEBUG_LOGGING", "true")
+
+    settings = Settings()
+
+    assert settings.debug_logging is True

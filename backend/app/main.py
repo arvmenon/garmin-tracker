@@ -3,8 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api.router import api_router
 from .core.config import get_settings
+from .core.logging import configure_logging, log_startup
 
 settings = get_settings()
+configure_logging(settings)
+log_startup(settings)
 
 app = FastAPI(title=settings.app_name)
 

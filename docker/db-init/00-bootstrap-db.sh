@@ -1,6 +1,18 @@
 #!/bin/sh
 set -eu
 
+DEBUG_LOGGING=${DEBUG_LOGGING:-false}
+
+log_debug() {
+    case "$DEBUG_LOGGING" in
+        1|true|TRUE|yes|YES|on|ON)
+            printf '%s\n' "$@"
+            ;;
+        *)
+            ;;
+    esac
+}
+
 PSQL_BIN=${PSQL_BIN:-psql}
 APP_DB_NAME=${APP_DB_NAME:-garmin_tracker}
 APP_DB_USER=${APP_DB_USER:-garmin_app}
@@ -16,6 +28,12 @@ READONLY_DB_USER_ESCAPED=$(printf "%s" "$READONLY_DB_USER" | sed "s/'/''/g")
 READONLY_DB_PASSWORD_ESCAPED=$(printf "%s" "$READONLY_DB_PASSWORD" | sed "s/'/''/g")
 NETDATA_DB_USER_ESCAPED=$(printf "%s" "$NETDATA_DB_USER" | sed "s/'/''/g")
 NETDATA_DB_PASSWORD_ESCAPED=$(printf "%s" "$NETDATA_DB_PASSWORD" | sed "s/'/''/g")
+
+log_debug "[db-init] Bootstrapping database roles"
+log_debug "[db-init] app_db=${APP_DB_NAME} app_user=${APP_DB_USER} readonly_user=${READONLY_DB_USER} netdata_user=${NETDATA_DB_USER}"
+if [ -z "$NETDATA_DB_USER" ]; then
+    log_debug "[db-init] netdata role creation disabled (NETDATA_DB_USER is empty)"
+fi
 
 "${PSQL_BIN}" -v ON_ERROR_STOP=1 \
      --username "$POSTGRES_USER" \
