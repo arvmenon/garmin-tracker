@@ -10,7 +10,6 @@ import { type NavItem, TopNav } from "@/components/navigation/TopNav";
 const navItems: NavItem[] = [
   { label: "Overview", href: "/" },
   { label: "Activities", href: "/activities" },
-  { label: "Comparisons", href: "/compare" },
   { label: "Devices", href: "/devices" },
   { label: "Admin", href: "/admin" },
   { label: "Settings", href: "/settings", icon: FiSettings },

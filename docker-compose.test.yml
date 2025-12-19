@@ -1,0 +1,24 @@
+services:
+  backend-tests:
+    image: python:3.11-slim
+    working_dir: /app
+    command: sh /app/docker/testing/backend-test.sh
+    volumes:
+      - .:/app
+      - backend_venv:/venv
+      - pip_cache:/root/.cache/pip
+
+  frontend-tests:
+    image: node:20
+    working_dir: /app
+    command: sh /app/docker/testing/frontend-test.sh
+    volumes:
+      - .:/app
+      - frontend_node_modules:/app/frontend/node_modules
+      - npm_cache:/root/.npm
+
+volumes:
+  backend_venv:
+  pip_cache:
+  frontend_node_modules:
+  npm_cache:

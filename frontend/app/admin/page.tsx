@@ -13,6 +13,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import { RuntimeHealthCard } from "@/components/admin/RuntimeHealthCard";
+
 const adminAreas = [
   {
     title: "User access",
@@ -55,6 +57,21 @@ export default function AdminPage() {
             <Button variant="outline">Export audit log</Button>
           </HStack>
         </Flex>
+
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+          <RuntimeHealthCard />
+          <Box p={{ base: 6, md: 8 }} borderWidth="1px" borderRadius="lg" bg="surface" shadow="sm">
+            <Stack spacing={3}>
+              <Heading size="md">Ops snapshot</Heading>
+              <Text color="text.muted">
+                Review sync stability, manual retries, and queued webhook volume before adjusting provider settings.
+              </Text>
+              <Button alignSelf="flex-start" variant="ghost" colorScheme="purple">
+                View ops report
+              </Button>
+            </Stack>
+          </Box>
+        </SimpleGrid>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
           {adminAreas.map((area) => (
