@@ -28,6 +28,8 @@ services:
 
   db:
     image: postgis/postgis:15-3.4
+    entrypoint: ["/bin/sh", "/docker/postgres-entrypoint.sh"]
+    command: ["postgres"]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -43,6 +45,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/db-init:/docker-entrypoint-initdb.d
+      - ./docker/postgres-entrypoint.sh:/docker/postgres-entrypoint.sh:ro
     ports:
       - "5432:5432"
 
