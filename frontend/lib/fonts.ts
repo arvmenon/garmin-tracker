@@ -5,7 +5,11 @@ export const fontFamilies = {
   mono: '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
 };
 
-export const fontVariableStyle: CSSProperties = {
+type FontVariableName = "--font-geist-sans" | "--font-geist-mono";
+
+export type FontVariableStyle = CSSProperties & Record<FontVariableName, string>;
+
+export const fontVariableStyle = {
   "--font-geist-sans": fontFamilies.sans,
   "--font-geist-mono": fontFamilies.mono,
-};
+} satisfies FontVariableStyle;

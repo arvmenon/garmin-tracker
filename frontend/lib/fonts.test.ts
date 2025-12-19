@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import type { CSSProperties } from "react";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { fontFamilies, fontVariableStyle } from "./fonts";
 
@@ -13,5 +14,9 @@ describe("fontVariableStyle", () => {
   it("maps font variables to the configured stacks", () => {
     expect(fontVariableStyle["--font-geist-sans"]).toBe(fontFamilies.sans);
     expect(fontVariableStyle["--font-geist-mono"]).toBe(fontFamilies.mono);
+  });
+
+  it("remains compatible with React CSSProperties", () => {
+    expectTypeOf(fontVariableStyle).toMatchTypeOf<CSSProperties>();
   });
 });
