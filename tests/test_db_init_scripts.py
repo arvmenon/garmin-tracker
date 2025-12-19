@@ -13,6 +13,8 @@ def run_bootstrap_script(
     app_db_name=None,
     netdata_password=None,
     netdata_user=None,
+    debug_logging=None,
+    return_output=False,
 ):
     capture_path = tmp_path / "captured.sql"
     stub_psql = tmp_path / "psql"
@@ -58,9 +60,23 @@ cat >>"$PSQL_CAPTURE_PATH"
     elif "NETDATA_DB_USER" in env:
         env.pop("NETDATA_DB_USER")
 
-    subprocess.run(["sh", str(SCRIPT_PATH)], check=True, env=env)
+    if debug_logging is not None:
+        env["DEBUG_LOGGING"] = debug_logging
+    elif "DEBUG_LOGGING" in env:
+        env.pop("DEBUG_LOGGING")
 
-    return capture_path.read_text()
+    result = subprocess.run(
+        ["sh", str(SCRIPT_PATH)],
+        check=True,
+        env=env,
+        capture_output=return_output,
+        text=True,
+    )
+
+    sql = capture_path.read_text()
+    if return_output:
+        return sql, result.stdout, result.stderr
+    return sql
 
 
 def test_bootstrap_script_inlines_password_and_escapes_quotes(tmp_path):
@@ -102,3 +118,10 @@ def test_bootstrap_script_allows_disabling_netdata_role(tmp_path):
     sql = run_bootstrap_script(tmp_path, netdata_user="")
 
     assert "netdata_user text := '';" in sql
+
+
+def test_bootstrap_script_emits_debug_log_when_enabled(tmp_path):
+    sql, stdout, _ = run_bootstrap_script(tmp_path, debug_logging="true", return_output=True)
+
+    assert "netdata_user text :=" in sql
+    assert "[db-init]" in stdout

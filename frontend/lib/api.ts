@@ -11,6 +11,38 @@ export function getApiBaseUrl() {
   return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 }
 
+export function isDebugLoggingEnabled() {
+  const value = process.env.NEXT_PUBLIC_DEBUG_LOGGING ?? "";
+  return ["1", "true", "yes", "on"].includes(value.toLowerCase());
+}
+
+function logDebug(message: string, details?: Record<string, unknown>) {
+  if (!isDebugLoggingEnabled()) return;
+  if (details) {
+    console.info(`[api] ${message}`, details);
+    return;
+  }
+  console.info(`[api] ${message}`);
+}
+
+function logWarn(message: string, details?: Record<string, unknown>) {
+  if (!isDebugLoggingEnabled()) return;
+  if (details) {
+    console.warn(`[api] ${message}`, details);
+    return;
+  }
+  console.warn(`[api] ${message}`);
+}
+
+function logError(message: string, details?: Record<string, unknown>) {
+  if (!isDebugLoggingEnabled()) return;
+  if (details) {
+    console.error(`[api] ${message}`, details);
+    return;
+  }
+  console.error(`[api] ${message}`);
+}
+
 export interface ApiErrorPayload {
   message: string;
   code?: string;
@@ -59,7 +91,7 @@ async function parseJson(response: Response) {
   }
 }
 
-async function handleError(response: Response): Promise<never> {
+async function handleError(response: Response, url: string): Promise<never> {
   const body = await parseJson(response);
   const envelope =
     body && typeof body === "object" && "error" in body ? (body as { error: ApiErrorPayload }).error : null;
@@ -69,6 +101,13 @@ async function handleError(response: Response): Promise<never> {
     (body && typeof body === "object" && "detail" in body ? String((body as { detail?: unknown }).detail) : null) ||
     response.statusText ||
     "Unexpected API error";
+
+  logWarn("Non-OK response received", {
+    url,
+    status: response.status,
+    statusText: response.statusText,
+    error: message,
+  });
 
   throw new ApiError({
     message,
@@ -81,21 +120,35 @@ async function handleError(response: Response): Promise<never> {
 export async function fetchApi<T>(path: string, options?: RequestInit & { query?: QueryParams }): Promise<T> {
   const { query, ...init } = options || {};
   const url = buildUrl(path, query);
+  const method = init.method ?? "GET";
 
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...(init.headers || {}),
-    },
-    ...init,
-  });
+  logDebug("Request started", { url, method });
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        ...(init.headers || {}),
+      },
+      ...init,
+    });
+  } catch (error) {
+    logError("Network error while calling API", {
+      url,
+      method,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
 
   if (!response.ok) {
-    await handleError(response);
+    await handleError(response, url);
   }
 
   const data = await parseJson(response);
+  logDebug("Response received", { url, method, status: response.status });
   if (data && typeof data === "object" && "data" in data) {
     return (data as { data: T }).data;
   }

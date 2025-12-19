@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildUrl, toPaginatedResult } from "./api";
+import { buildUrl, isDebugLoggingEnabled, toPaginatedResult } from "./api";
 import { ActivitySummary } from "./types";
 
 describe("buildUrl", () => {
@@ -30,5 +30,17 @@ describe("toPaginatedResult", () => {
     expect(result.items).toHaveLength(1);
     expect(result.page).toBe(1);
     expect(result.hasMore).toBe(false);
+  });
+});
+
+describe("isDebugLoggingEnabled", () => {
+  it("returns true when the flag is enabled", () => {
+    process.env.NEXT_PUBLIC_DEBUG_LOGGING = "true";
+    expect(isDebugLoggingEnabled()).toBe(true);
+  });
+
+  it("returns false when the flag is disabled", () => {
+    process.env.NEXT_PUBLIC_DEBUG_LOGGING = "false";
+    expect(isDebugLoggingEnabled()).toBe(false);
   });
 });
