@@ -35,6 +35,8 @@ services:
       APP_DB_PASSWORD: ${APP_DB_PASSWORD:-garmin_app}
       READONLY_DB_USER: ${READONLY_DB_USER:-garmin_readonly}
       READONLY_DB_PASSWORD: ${READONLY_DB_PASSWORD:-garmin_readonly}
+      NETDATA_DB_USER: ${NETDATA_DB_USER:-netdata}
+      NETDATA_DB_PASSWORD: ${NETDATA_DB_PASSWORD:-netdata}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/db-init:/docker-entrypoint-initdb.d
