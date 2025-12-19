@@ -1,12 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { getActivities } from "@/lib/api";
 import { ACTIVITIES_QUERY_KEY, useActivities } from "@/lib/hooks/useActivities";
 
-vi.mock("@tanstack/react-query", () => ({
-  useQuery: vi.fn(),
-}));
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-query")>();
+  return {
+    ...actual,
+    useQuery: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/api", () => ({
   getActivities: vi.fn(),
@@ -37,7 +41,7 @@ describe("useActivities", () => {
     expect(useQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({
         queryKey: [ACTIVITIES_QUERY_KEY, params],
-        keepPreviousData: true,
+        placeholderData: keepPreviousData,
         staleTime: 60_000,
         refetchInterval: 120_000,
       }),

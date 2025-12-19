@@ -21,6 +21,7 @@ Welcome! This repository currently holds early product requirements for a Garmin
 - Every code change must include or update automated tests. Documentation-only changes may skip tests but should be noted.
 - Aim for fast, deterministic unit tests and prioritize the test pyramid (unit > integration > end-to-end).
 - Use the testing strategy in `TESTING.md` as the baseline; update it if the stack or philosophy evolves.
+- For frontend changes, ensure `vitest` is installed and run `npm test` (or the equivalent `vitest run`) so unit tests execute on every change.
 
 ## Security & Data
 - Do not commit secrets or tokens. Use environment variables and `.env.example` patterns when needed.
