@@ -30,6 +30,10 @@ This document outlines the baseline testing framework and philosophy for the Gar
 - Provide a minimal `npm test`/`pnpm test` or `pytest` entry point. Document any required environment variables or services.
 - Measure and report test runtime in CI to keep suites lean.
 
+## Local Setup
+- Install backend test dependencies before running `pytest`: `pip install -r backend/requirements.txt`.
+- Install frontend test dependencies before running `npm test`: `cd frontend && npm install`.
+
 ## Open Items
 - Confirm final frontend/backend stacks to lock tooling versions.
 - Decide on coverage enforcement thresholds in CI and how to handle temporary waivers.
