@@ -38,14 +38,14 @@ cat >"$PSQL_CAPTURE_PATH"
 def test_netdata_script_inlines_password_and_escapes_quotes(tmp_path):
     sql = run_netdata_script(tmp_path, "s'neaky")
 
-    assert "target_password text := 's''neaky';" in sql
-    assert ":netdata_password" not in sql
+    assert "format('CREATE ROLE netdata LOGIN PASSWORD %L', 's''neaky')" in sql
+    assert "netdata_password" not in sql
 
 
 def test_netdata_script_defaults_to_expected_password(tmp_path):
     sql = run_netdata_script(tmp_path)
 
-    assert "target_password text := 'netdata';" in sql
+    assert "format('CREATE ROLE netdata LOGIN PASSWORD %L', 'netdata')" in sql
 
 
 def test_netdata_script_grants_expected_privileges(tmp_path):
