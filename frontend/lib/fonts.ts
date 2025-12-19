@@ -9,7 +9,7 @@ type FontVariableName = "--font-geist-sans" | "--font-geist-mono";
 
 export type FontVariableStyle = CSSProperties & Record<FontVariableName, string>;
 
-export const fontVariableStyle = {
+export const fontVariableStyle: FontVariableStyle = {
   "--font-geist-sans": fontFamilies.sans,
   "--font-geist-mono": fontFamilies.mono,
-} satisfies FontVariableStyle;
+};
