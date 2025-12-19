@@ -15,6 +15,7 @@ def run_bootstrap_script(
     netdata_user=None,
     debug_logging=None,
     return_output=False,
+    script_path=SCRIPT_PATH,
 ):
     capture_path = tmp_path / "captured.sql"
     stub_psql = tmp_path / "psql"
@@ -66,7 +67,7 @@ cat >>"$PSQL_CAPTURE_PATH"
         env.pop("DEBUG_LOGGING")
 
     result = subprocess.run(
-        ["sh", str(SCRIPT_PATH)],
+        ["sh", str(script_path)],
         check=True,
         env=env,
         capture_output=return_output,
@@ -125,3 +126,50 @@ def test_bootstrap_script_emits_debug_log_when_enabled(tmp_path):
 
     assert "netdata_user text :=" in sql
     assert "[db-init]" in stdout
+
+
+def test_entrypoint_creates_netdata_role_when_missing(tmp_path):
+    entrypoint_path = Path(__file__).resolve().parents[1] / "docker/postgres-entrypoint.sh"
+    capture_path = tmp_path / "captured.sql"
+    stub_entrypoint = tmp_path / "docker-entrypoint.sh"
+    stub_pg_isready = tmp_path / "pg_isready"
+    stub_psql = tmp_path / "psql"
+
+    stub_entrypoint.write_text(
+        """#!/bin/sh
+exit 0
+"""
+    )
+    stub_pg_isready.write_text(
+        """#!/bin/sh
+exit 0
+"""
+    )
+    stub_psql.write_text(
+        """#!/bin/sh
+echo "-- PSQL CALL --" >>"$PSQL_CAPTURE_PATH"
+cat >>"$PSQL_CAPTURE_PATH"
+"""
+    )
+    stub_entrypoint.chmod(0o755)
+    stub_pg_isready.chmod(0o755)
+    stub_psql.chmod(0o755)
+
+    env = os.environ.copy()
+    env.update(
+        {
+            "DOCKER_ENTRYPOINT_BIN": str(stub_entrypoint),
+            "PG_ISREADY_BIN": str(stub_pg_isready),
+            "PSQL_BIN": str(stub_psql),
+            "PSQL_CAPTURE_PATH": str(capture_path),
+            "POSTGRES_USER": "postgres",
+            "POSTGRES_DB": "postgres",
+            "APP_DB_NAME": "garmin_tracker",
+        }
+    )
+
+    subprocess.run(["sh", str(entrypoint_path), "postgres"], check=True, env=env)
+
+    sql = capture_path.read_text()
+    assert "CREATE ROLE %I LOGIN PASSWORD %L" in sql
+    assert "GRANT pg_monitor TO %I" in sql
