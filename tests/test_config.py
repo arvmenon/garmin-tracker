@@ -33,3 +33,11 @@ def test_allowed_origins_accepts_iterable(monkeypatch):
     )
 
     assert settings.allowed_origins == ["http://example.com", "http://localhost:3000"]
+
+
+def test_database_url_default(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+
+    settings = Settings()
+
+    assert settings.database_url == "postgresql+psycopg2://garmin_app:garmin_app@localhost:5432/garmin_tracker"
