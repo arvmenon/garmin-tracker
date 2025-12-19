@@ -18,16 +18,18 @@ const getActivitiesMock = vi.mocked(getActivities);
 describe("useActivities", () => {
   it("configures the activities query and delegates to the API helper", async () => {
     const params = { page: 2, pageSize: 5, type: "running" };
+    const apiResponse = {
+      items: [],
+      count: 0,
+      page: 2,
+      pageSize: 5,
+      hasMore: false,
+    };
     const queryResult = {
-      data: {
-        items: [],
-        count: 0,
-        page: 2,
-        pageSize: 5,
-        hasMore: false,
-      },
+      data: apiResponse,
     };
     useQueryMock.mockReturnValue(queryResult as ReturnType<typeof useActivities>);
+    getActivitiesMock.mockResolvedValue(apiResponse);
 
     const result = useActivities(params);
     expect(result).toBe(queryResult);
@@ -42,7 +44,7 @@ describe("useActivities", () => {
     );
 
     const queryOptions = useQueryMock.mock.calls[0]?.[0];
-    await queryOptions.queryFn();
+    await expect(queryOptions.queryFn()).resolves.toBe(apiResponse);
     expect(getActivitiesMock).toHaveBeenCalledWith(params);
   });
 });

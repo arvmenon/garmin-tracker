@@ -16,6 +16,12 @@ describe("fontVariableStyle", () => {
     expect(fontVariableStyle["--font-geist-mono"]).toBe(fontFamilies.mono);
   });
 
+  it("exposes both Geist font variables", () => {
+    expect(Object.keys(fontVariableStyle)).toEqual(
+      expect.arrayContaining(["--font-geist-sans", "--font-geist-mono"]),
+    );
+  });
+
   it("remains compatible with React CSSProperties", () => {
     expectTypeOf(fontVariableStyle).toMatchTypeOf<CSSProperties>();
   });
