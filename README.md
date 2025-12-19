@@ -1,13 +1,22 @@
 # Garmin Tracker
 
-This repo tracks requirements for a privacy-first, self-hosted Garmin-first activity ingestion platform with future multi-provider support.
+FastAPI backend with a Next.js + Chakra UI frontend for Garmin activity insights.
 
-## Getting Started
-- Review `REQUIREMENTS.md` for detailed provider scope, ingestion flows, metrics, authentication, and non-functional expectations.
-- Review `ARCHITECTURE_PROPOSAL.md` for the recommended stack, Docker Compose layout, and privacy-focused hosting targets.
-- Contribute changes on the `development` branch and open a pull request for review.
-- Documentation-only changes do not require code builds, but tests should accompany any future implementation.
+## Development
+1. Create a Python 3.11 virtual environment.
+2. Install backend deps: `pip install -r backend/requirements.txt`.
+3. Run the API locally: `uvicorn backend.app.main:app --reload`.
+4. Install frontend deps: `cd frontend && npm install` (Node 18+).
+5. Copy `frontend/.env.example` to `frontend/.env.local` and set `NEXT_PUBLIC_API_BASE_URL` to your API origin.
+6. Start the UI on port **4010**: `npm run dev` (production: `npm run start`, also on **4010**).
+7. Run tests: `pytest` for backend; `npm run lint` for frontend.
 
-## Branches
-- `development`: active collaboration branch for documentation and feature work.
-- `work`: historical baseline branch containing the initial drafts.
+### Docker
+- Bring up the UI and API with `docker-compose up frontend api` (add `--build` on the first run).
+- Services expose:
+  - API: `http://localhost:8009`
+  - Frontend: `http://localhost:4010`
+- The compose file sets `NEXT_PUBLIC_API_BASE_URL` for the UI and `ALLOWED_ORIGINS` for the API to keep CORS aligned.
+
+## Branching
+All pull requests should target the `development` branch (not `main`).

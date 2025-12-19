@@ -1,0 +1,58 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8009:8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/garmin_tracker
+      - ALLOWED_ORIGINS=http://localhost:4010,http://frontend:4010
+    depends_on:
+      - db
+      - db-netdata-bootstrap
+
+  frontend:
+    image: node:20
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- -p 4010"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8009
+    ports:
+      - "4010:4010"
+    depends_on:
+      - api
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: garmin_tracker
+      NETDATA_DB_PASSWORD: netdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  db-netdata-bootstrap:
+    image: postgres:15-alpine
+    depends_on:
+      - db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: garmin_tracker
+      NETDATA_DB_PASSWORD: netdata
+      PGHOST: db
+      PGPASSWORD: postgres
+    volumes:
+      - ./docker/db-init/01-create-netdata-user.sh:/scripts/create-netdata-user.sh:ro
+    entrypoint: >-
+      sh -c "until pg_isready -U \"$$POSTGRES_USER\"; do sleep 1; done; sh /scripts/create-netdata-user.sh"
+
+volumes:
+  pgdata:
