@@ -7,8 +7,14 @@ FastAPI backend with a Next.js + Chakra UI frontend for Garmin activity insights
 - **Python:** 3.11 (for API and tests).
 - **Node:** 18+ (for UI and UI tests).
 - **Docker:** for Postgres/PostGIS container.
+- **Docker Compose:** required to launch the stack locally.
 - **Backend deps (including tests):** `pip install -r backend/requirements.txt`.
 - **Frontend deps (including tests):** `cd frontend && npm install`.
+
+### Install Docker and Docker Compose (Ubuntu)
+- `sudo apt-get update`
+- `sudo apt-get install -y docker.io docker-compose python3-setuptools`
+  - `python3-setuptools` provides the `distutils` shim needed by the Ubuntu `docker-compose` package on Python 3.12.
 
 1. Create a Python 3.11 virtual environment.
 2. Install backend deps: `pip install -r backend/requirements.txt`.
