@@ -76,6 +76,7 @@
 - **Observability:** Structured logs per provider, metrics on latency/failure rates, and dead-letter queues for ingestion errors. Netdata is out of scope unless explicitly enabled, to avoid implicit database users and startup dependencies in the default Compose setup.
 - **Data consistency:** Strong consistency for user-facing reads after ingestion completion; eventual consistency acceptable during in-flight sync.
 - **Frontend/API connectivity:** The frontend must read its API base URL from `NEXT_PUBLIC_API_BASE_URL` so Docker deployments can point it at an internal service name (e.g., `http://api:8000`) or the Docker host (`http://host.docker.internal:<port>`) for local development.
+- **Frontend build persistence:** Docker Compose must mount a dedicated named volume (e.g., `frontend_build`) to persist Next.js build artifacts (`/app/.next`) across container restarts.
 
 ## Database Provisioning & Operations
 - **Bootstrap workflow:** Database setup must be repeatable from zero and safe to re-run; use a single documented flow for local, staging, and production.
