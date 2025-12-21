@@ -7,8 +7,21 @@ export interface ActivityListResponse {
   items: ActivitySummary[];
 }
 
+function normalizeBaseUrl(value: string) {
+  return value.replace(/\/+$/, "");
+}
+
 export function getApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+  const configured = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (configured && configured.trim()) {
+    return normalizeBaseUrl(configured);
+  }
+
+  if (typeof window !== "undefined") {
+    return "";
+  }
+
+  return "http://localhost:8000";
 }
 
 export function isDebugLoggingEnabled() {
@@ -65,10 +78,17 @@ export class ApiError extends Error {
 }
 
 export function buildUrl(path: string, query?: QueryParams): string {
-  const basePath = path.startsWith("http")
-    ? path
-    : `${getApiBaseUrl()}${path.startsWith("/") ? "" : "/"}${path}`;
+  if (path.startsWith("http")) {
+    return buildQuery(path, query);
+  }
 
+  const baseUrl = getApiBaseUrl();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const basePath = baseUrl ? `${baseUrl}${normalizedPath}` : normalizedPath;
+  return buildQuery(basePath, query);
+}
+
+function buildQuery(basePath: string, query?: QueryParams): string {
   if (!query || Object.keys(query).length === 0) {
     return basePath;
   }

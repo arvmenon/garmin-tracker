@@ -21,6 +21,7 @@ Welcome! This repository currently holds early product requirements for a Garmin
 - Every code change must include or update automated tests. Documentation-only changes may skip tests but should be noted.
 - Aim for fast, deterministic unit tests and prioritize the test pyramid (unit > integration > end-to-end).
 - Use the testing strategy in `TESTING.md` as the baseline; update it if the stack or philosophy evolves.
+- Install testing tooling for the stack you touch (for example, run `npm install` in `frontend/` to ensure `vitest` is available and `pip install -r backend/requirements.txt` for backend tests).
 - For frontend changes, ensure `vitest` is installed and run `npm test` (or the equivalent `vitest run`) so unit tests execute on every change.
 - Install backend test dependencies with `pip install -r backend/requirements.txt` before running `pytest`.
 
