@@ -16,7 +16,7 @@
 
 ## Docker / Docker Compose Layout (Single-Host Friendly)
 - **proxy:** Caddy or Traefik for TLS termination (supports local ACME or self-signed certs) and routing to `api` and `frontend`; can add basic auth on admin routes.
-- **frontend:** Next.js container (Node 18 LTS) serving prebuilt assets via `next start`; can be folded into `proxy` as static assets if desired.
+- **frontend:** Next.js container (Node 18 LTS) serving prebuilt assets via `next start`; can be folded into `proxy` as static assets if desired. The frontend must read its API base URL from `NEXT_PUBLIC_API_BASE_URL` so Docker deployments can point it at `http://api:8000` (internal) or `http://host.docker.internal:<port>` when the API is running on the host. For Linux Docker hosts, add `extra_hosts: ["host.docker.internal:host-gateway"]` to the frontend service so the hostname resolves.
 - **api:** FastAPI app container (uvicorn/gunicorn) exposing REST + webhook endpoints; mounts shared volume for static assets and FIT/TCX samples when needed.
 - **worker:** Celery worker image built from the same codebase; optional `beat` scheduler container for periodic polling/backfill jobs.
 - **db:** PostgreSQL with PostGIS; dedicated volume for data and WAL archiving; backups handled by a sidecar cron or host-level tools (e.g., `pgbackrest`).
