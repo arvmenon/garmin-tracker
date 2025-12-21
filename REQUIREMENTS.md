@@ -73,7 +73,7 @@
 
 ## Non-Functional
 - **Scalability:** Design ingestion to be horizontally scalable; queue-based processing for webhooks/uploads.
-- **Observability:** Structured logs per provider, metrics on latency/failure rates, and dead-letter queues for ingestion errors.
+- **Observability:** Structured logs per provider, metrics on latency/failure rates, and dead-letter queues for ingestion errors. Netdata is out of scope unless explicitly enabled, to avoid implicit database users and startup dependencies in the default Compose setup.
 - **Data consistency:** Strong consistency for user-facing reads after ingestion completion; eventual consistency acceptable during in-flight sync.
 
 ## Database Provisioning & Operations
@@ -83,6 +83,7 @@
 - **Seed data:** Reference data (activity types, device catalogs, RBAC defaults) must be versioned and tracked in a `seed_history` table.
 - **Reset policy:** Local development can drop and rebuild data; staging/production reset is forbidden outside approved disaster recovery procedures.
 - **Backup readiness:** Backups and restore drills are required; WAL archiving enabled wherever durability matters.
+- **Monitoring users:** Database bootstrap must not assume Netdata credentials or create monitoring users unless the integration is explicitly enabled and configured.
 
 ## Caching Strategy
 - **API responses:** Cache read-heavy endpoints (activity lists, summary stats) in Redis with short TTLs (30–120s) and per-user keys; bust cache on ingest/update events.
