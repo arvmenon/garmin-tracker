@@ -39,7 +39,7 @@ fi
      --username "$POSTGRES_USER" \
      --dbname "$POSTGRES_DB" <<SQL
 DO
-$$
+\$\$
 DECLARE
     app_db text := '${APP_DB_NAME_ESCAPED}';
     app_user text := '${APP_DB_USER_ESCAPED}';
@@ -74,7 +74,7 @@ BEGIN
         EXECUTE format('CREATE DATABASE %I OWNER %I', app_db, app_user);
     END IF;
 END
-$$;
+\$\$;
 SQL
 
 "${PSQL_BIN}" -v ON_ERROR_STOP=1 \
@@ -83,7 +83,7 @@ SQL
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 DO
-$$
+\$\$
 DECLARE
     app_db text := '${APP_DB_NAME_ESCAPED}';
     app_user text := '${APP_DB_USER_ESCAPED}';
@@ -107,5 +107,5 @@ BEGIN
         EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', app_db, netdata_user);
     END IF;
 END
-$$;
+\$\$;
 SQL
