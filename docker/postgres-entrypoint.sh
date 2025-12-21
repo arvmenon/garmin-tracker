@@ -33,7 +33,7 @@ done
     --username "$POSTGRES_USER" \
     --dbname "$POSTGRES_DB" <<SQL
 DO
-$$
+\$\$
 DECLARE
     app_db text := '${APP_DB_NAME_ESCAPED}';
     netdata_user text := '${NETDATA_DB_USER_ESCAPED}';
@@ -52,7 +52,7 @@ BEGIN
         EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', app_db, netdata_user);
     END IF;
 END
-$$;
+\$\$;
 SQL
 
 wait "$postgres_pid"

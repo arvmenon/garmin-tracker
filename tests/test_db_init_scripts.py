@@ -83,6 +83,7 @@ cat >>"$PSQL_CAPTURE_PATH"
 def test_bootstrap_script_inlines_password_and_escapes_quotes(tmp_path):
     sql = run_bootstrap_script(tmp_path, app_password="s'neaky")
 
+    assert "DO\n$$" in sql
     assert "app_password text := 's''neaky';" in sql
     assert ":app_db_password" not in sql
 
@@ -171,5 +172,6 @@ cat >>"$PSQL_CAPTURE_PATH"
     subprocess.run(["sh", str(entrypoint_path), "postgres"], check=True, env=env)
 
     sql = capture_path.read_text()
+    assert "DO\n$$" in sql
     assert "CREATE ROLE %I LOGIN PASSWORD %L" in sql
     assert "GRANT pg_monitor TO %I" in sql
