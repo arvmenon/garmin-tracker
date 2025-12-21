@@ -11,8 +11,6 @@ def run_bootstrap_script(
     app_password=None,
     readonly_password=None,
     app_db_name=None,
-    netdata_password=None,
-    netdata_user=None,
     debug_logging=None,
     return_output=False,
     script_path=SCRIPT_PATH,
@@ -51,16 +49,6 @@ cat >>"$PSQL_CAPTURE_PATH"
     elif "APP_DB_NAME" in env:
         env.pop("APP_DB_NAME")
 
-    if netdata_password is not None:
-        env["NETDATA_DB_PASSWORD"] = netdata_password
-    elif "NETDATA_DB_PASSWORD" in env:
-        env.pop("NETDATA_DB_PASSWORD")
-
-    if netdata_user is not None:
-        env["NETDATA_DB_USER"] = netdata_user
-    elif "NETDATA_DB_USER" in env:
-        env.pop("NETDATA_DB_USER")
-
     if debug_logging is not None:
         env["DEBUG_LOGGING"] = debug_logging
     elif "DEBUG_LOGGING" in env:
@@ -93,7 +81,6 @@ def test_bootstrap_script_defaults_to_expected_passwords(tmp_path):
 
     assert "app_password text := 'garmin_app';" in sql
     assert "readonly_password text := 'garmin_readonly';" in sql
-    assert "netdata_password text := 'netdata';" in sql
 
 
 def test_bootstrap_script_sets_up_roles_and_privileges(tmp_path):
@@ -102,7 +89,6 @@ def test_bootstrap_script_sets_up_roles_and_privileges(tmp_path):
         app_password="garmin_app",
         readonly_password="garmin_readonly",
         app_db_name="garmin_tracker",
-        netdata_password="netdata",
     )
 
     assert "app_db text := 'garmin_tracker';" in sql
@@ -113,65 +99,35 @@ def test_bootstrap_script_sets_up_roles_and_privileges(tmp_path):
     assert "GRANT USAGE, CREATE ON SCHEMA public" in sql
     assert "GRANT SELECT ON ALL TABLES IN SCHEMA public" in sql
     assert "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO %I" in sql
-    assert "GRANT pg_monitor TO %I" in sql
-
-
-def test_bootstrap_script_allows_disabling_netdata_role(tmp_path):
-    sql = run_bootstrap_script(tmp_path, netdata_user="")
-
-    assert "netdata_user text := '';" in sql
 
 
 def test_bootstrap_script_emits_debug_log_when_enabled(tmp_path):
     sql, stdout, _ = run_bootstrap_script(tmp_path, debug_logging="true", return_output=True)
 
-    assert "netdata_user text :=" in sql
     assert "[db-init]" in stdout
 
 
-def test_entrypoint_creates_netdata_role_when_missing(tmp_path):
+def test_entrypoint_executes_docker_entrypoint(tmp_path):
     entrypoint_path = Path(__file__).resolve().parents[1] / "docker/postgres-entrypoint.sh"
-    capture_path = tmp_path / "captured.sql"
     stub_entrypoint = tmp_path / "docker-entrypoint.sh"
-    stub_pg_isready = tmp_path / "pg_isready"
-    stub_psql = tmp_path / "psql"
+    capture_path = tmp_path / "entrypoint.log"
 
     stub_entrypoint.write_text(
         """#!/bin/sh
-exit 0
-"""
-    )
-    stub_pg_isready.write_text(
-        """#!/bin/sh
-exit 0
-"""
-    )
-    stub_psql.write_text(
-        """#!/bin/sh
-echo "-- PSQL CALL --" >>"$PSQL_CAPTURE_PATH"
-cat >>"$PSQL_CAPTURE_PATH"
+echo "entrypoint called" >>"$ENTRYPOINT_LOG"
 """
     )
     stub_entrypoint.chmod(0o755)
-    stub_pg_isready.chmod(0o755)
-    stub_psql.chmod(0o755)
 
     env = os.environ.copy()
     env.update(
         {
             "DOCKER_ENTRYPOINT_BIN": str(stub_entrypoint),
-            "PG_ISREADY_BIN": str(stub_pg_isready),
-            "PSQL_BIN": str(stub_psql),
-            "PSQL_CAPTURE_PATH": str(capture_path),
-            "POSTGRES_USER": "postgres",
-            "POSTGRES_DB": "postgres",
-            "APP_DB_NAME": "garmin_tracker",
+            "ENTRYPOINT_LOG": str(capture_path),
         }
     )
 
     subprocess.run(["sh", str(entrypoint_path), "postgres"], check=True, env=env)
 
-    sql = capture_path.read_text()
-    assert "DO\n$$" in sql
-    assert "CREATE ROLE %I LOGIN PASSWORD %L" in sql
-    assert "GRANT pg_monitor TO %I" in sql
+    output = capture_path.read_text()
+    assert "entrypoint called" in output
