@@ -10,7 +10,12 @@ from pydantic_settings import (
     SettingsConfigDict,
 )
 
-DEFAULT_ALLOWED_ORIGINS = ("http://localhost:4010", "http://127.0.0.1:4010")
+DEFAULT_ALLOWED_ORIGINS = (
+    "http://localhost:4010",
+    "http://127.0.0.1:4010",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+)
 
 
 def _normalize_origins(value: Any) -> list[str]:
