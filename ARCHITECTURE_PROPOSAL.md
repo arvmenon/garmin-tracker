@@ -22,7 +22,7 @@
 - **db:** PostgreSQL with PostGIS; dedicated volume for data and WAL archiving; backups handled by a sidecar cron or host-level tools (e.g., `pgbackrest`).
 - **redis:** Redis as Celery broker and cache for rate limits/session storage.
 - **minio:** MinIO with persistent volume for raw payloads and exports; use server-side encryption keys stored on host.
-- **observability (optional):** Loki + Promtail for logs and Grafana for dashboards; all deployed via Compose profiles for opt-in use.
+- **observability (optional):** Loki + Promtail for logs and Grafana for dashboards; all deployed via Compose profiles for opt-in use. Netdata is excluded from the baseline stack and default Compose profiles to avoid implicit database users or startup dependencies.
 
 ## Database Setup (Greenfield Bootstrap)
 This resets the database setup approach to be explicit, repeatable, and safe for both local development and production environments.
@@ -32,6 +32,7 @@ This resets the database setup approach to be explicit, repeatable, and safe for
 - **Environment parity:** Use the same bootstrap flow in local, staging, and production with only secrets and storage paths varying.
 - **Least privilege:** Distinct roles for migration tasks vs. application runtime access.
 - **Auditability:** Every schema change is tracked and reversible via migrations.
+- **No implicit monitoring users:** Bootstrap scripts must not create or require Netdata (or other monitoring) database users unless explicitly enabled and configured.
 
 ### Bootstrap Flow (from zero)
 1. **Provision secrets and storage**
